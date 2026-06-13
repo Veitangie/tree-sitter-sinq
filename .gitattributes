@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# Node.js bindings
+bindings/node/* linguist-generated
+binding.gyp linguist-generated
+package.json linguist-generated
+package-lock.json linguist-generated

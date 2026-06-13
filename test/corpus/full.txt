@@ -1,0 +1,73 @@
+==================
+Full HTTP Request
+==================
+
+$PRE{ 
+    local setup = true 
+}
+
+P${"OS"}T https://api.example.com/users/${CREATED_ID} HTTP/1.1
+Authorization: Bearer ${AUTH_TOKEN}
+$DYNAMIC_HEADER_GENERATOR{ return "X-Custom: true" }
+X-Custom-New: ${return "false"}
+Static-Header: Static Value
+
+{
+    "status": "active",
+    "role": "admin"
+}
+
+$ASSERT{
+    sinq.assert.code(200)
+}
+
+---
+
+(source_file
+  (lifecycle_script
+    (lifecycle_directive)
+    (raw_lua_content))
+  (request_line
+    (method
+      (method_chunk)
+      (inline_script
+        (directive)
+        (raw_lua_content))
+      (method_chunk))
+    (url
+      (url_chunk)
+      (inline_script
+        (directive)
+        (raw_lua_content)))
+    (proto
+      (proto_chunk)))
+  (header_line
+    (header_name
+      (header_name_chunk))
+    (header_value
+      (header_value_chunk)
+      (inline_script
+        (directive)
+        (raw_lua_content))))
+  (header_line
+    (dynamic_header
+      (inline_script
+        (directive)
+        (raw_lua_content))))
+  (header_line
+    (header_name
+      (header_name_chunk))
+    (header_value
+      (inline_script
+        (directive)
+        (raw_lua_content))))
+  (header_line
+    (header_name
+      (header_name_chunk))
+    (header_value
+      (header_value_chunk)))
+  (body
+    (body_chunk))
+  (lifecycle_script
+    (lifecycle_directive)
+    (raw_lua_content)))

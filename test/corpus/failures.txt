@@ -1,0 +1,62 @@
+==================
+Invalid: Body before Request Line
+==================
+
+{ "this": "should_fail" }
+
+GET / HTTP/1.1
+
+---
+
+(source_file
+  (lifecycle_script
+    (lifecycle_directive
+      (MISSING "$PRE"))
+      (raw_lua_content))
+    (request_line
+      (method
+        (method_chunk))
+      (url
+        (url_chunk))
+      (proto
+        (proto_chunk))))
+
+==================
+Invalid: Two Request Lines
+==================
+
+GET / HTTP/1.1
+GET / HTTP/1.1
+
+---
+
+(source_file
+  (request_line
+    method: (method
+      (method_chunk))
+    url: (url
+      (url_chunk))
+    proto: (proto
+      (proto_chunk)))
+  (ERROR
+    (dynamic_chunk)))
+
+==================
+Invalid: Header without Colon (that isn't a script)
+==================
+
+GET / HTTP/1.1
+Authorization Bearer Token
+
+---
+
+(source_file
+  (request_line
+    method: (method
+      (method_chunk))
+    url: (url
+      (url_chunk))
+    proto: (proto
+      (proto_chunk)))
+  (ERROR
+    (dynamic_chunk)))

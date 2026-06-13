@@ -1,0 +1,371 @@
+[
+  {
+    "type": "body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body_chunk",
+          "named": true
+        },
+        {
+          "type": "inline_script",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "directive",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "dynamic_header",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dynamic_chunk",
+          "named": true
+        },
+        {
+          "type": "inline_script",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "header_line",
+    "named": true,
+    "fields": {
+      "dynamic": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "dynamic_header",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "header_name",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "header_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "header_name",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "header_name_chunk",
+          "named": true
+        },
+        {
+          "type": "inline_script",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "header_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "header_value_chunk",
+          "named": true
+        },
+        {
+          "type": "inline_script",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inline_script",
+    "named": true,
+    "fields": {
+      "directive": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "directive",
+            "named": true
+          }
+        ]
+      },
+      "lua_code": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "raw_lua_content",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "lifecycle_directive",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "lifecycle_script",
+    "named": true,
+    "fields": {
+      "directive": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "lifecycle_directive",
+            "named": true
+          }
+        ]
+      },
+      "lua_code": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "raw_lua_content",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "method",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_script",
+          "named": true
+        },
+        {
+          "type": "method_chunk",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "proto",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_script",
+          "named": true
+        },
+        {
+          "type": "proto_chunk",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "request_line",
+    "named": true,
+    "fields": {
+      "method": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "method",
+            "named": true
+          }
+        ]
+      },
+      "proto": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "proto",
+            "named": true
+          }
+        ]
+      },
+      "url": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "url",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "inline_script",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "header_line",
+          "named": true
+        },
+        {
+          "type": "lifecycle_script",
+          "named": true
+        },
+        {
+          "type": "request_line",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "url",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_script",
+          "named": true
+        },
+        {
+          "type": "url_chunk",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "$",
+    "named": false
+  },
+  {
+    "type": "$ASSERT",
+    "named": false
+  },
+  {
+    "type": "$POST",
+    "named": false
+  },
+  {
+    "type": "$PRE",
+    "named": false
+  },
+  {
+    "type": "$RETRY",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "body_chunk",
+    "named": true
+  },
+  {
+    "type": "dynamic_chunk",
+    "named": true
+  },
+  {
+    "type": "header_name_chunk",
+    "named": true
+  },
+  {
+    "type": "header_value_chunk",
+    "named": true
+  },
+  {
+    "type": "method_chunk",
+    "named": true
+  },
+  {
+    "type": "proto_chunk",
+    "named": true
+  },
+  {
+    "type": "raw_lua_content",
+    "named": true
+  },
+  {
+    "type": "url_chunk",
+    "named": true
+  },
+  {
+    "type": "{",
+    "named": false
+  },
+  {
+    "type": "}",
+    "named": false
+  }
+]

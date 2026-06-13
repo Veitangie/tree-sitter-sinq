@@ -1,0 +1,40 @@
+==================
+Full Script Lifecycle
+==================
+
+$PRE{ local a = 1 }
+
+POST ${env.url} HTTP/1.1
+Authorization: ${token}
+
+{ "data": "value" }
+
+$ASSERT{ sinq.assert(200) }
+
+---
+
+(source_file
+  (lifecycle_script
+    directive: (lifecycle_directive)
+    lua_code: (raw_lua_content))
+  (request_line
+    method: (method
+      (method_chunk))
+    url: (url
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content)))
+    proto: (proto
+      (proto_chunk)))
+  (header_line
+    name: (header_name
+      (header_name_chunk))
+    value: (header_value
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content))))
+  (body
+    (body_chunk))
+  (lifecycle_script
+    directive: (lifecycle_directive)
+    lua_code: (raw_lua_content)))

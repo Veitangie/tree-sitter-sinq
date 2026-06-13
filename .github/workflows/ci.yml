@@ -1,0 +1,115 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - 'src/**'
+      - 'grammar.js'
+  pull_request:
+    branches: [ "**" ]
+    paths:
+      - 'src/**'
+      - 'grammar.js'
+  release:
+    types: [published]
+
+jobs:
+  test:
+    name: Test Parser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate and Test Parser
+        run: |
+          npx tree-sitter generate
+          npx tree-sitter test
+
+  build:
+    name: Build on ${{ matrix.os }}
+    needs: test
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: tree-sitter-sinq-linux-x64.so
+            cmd: gcc -O3 -shared -fPIC -I src src/parser.c src/scanner.c -o tree-sitter-sinq-linux-x64.so
+          
+          - os: macos-13
+            artifact: tree-sitter-sinq-macos-x64.dylib
+            cmd: clang -O3 -dynamiclib -fPIC -arch x86_64 -I src src/parser.c src/scanner.c -o tree-sitter-sinq-macos-x64.dylib
+          
+          - os: macos-latest
+            artifact: tree-sitter-sinq-macos-arm64.dylib
+            cmd: clang -O3 -dynamiclib -fPIC -arch arm64 -I src src/parser.c src/scanner.c -o tree-sitter-sinq-macos-arm64.dylib
+          
+          - os: windows-latest
+            artifact: tree-sitter-sinq-windows-x64.dll
+            cmd: gcc -O3 -shared -I src src/parser.c src/scanner.c -o tree-sitter-sinq-windows-x64.dll
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Compile Parser
+        run: ${{ matrix.cmd }}
+
+      - name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} ${{ matrix.artifact }}
+
+  build-vscode:
+    name: Build VS Code Extension
+    needs: test
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+
+      - name: Resolve Query Symlinks for Packaging
+        run: |
+          rm -rf vscode/queries
+          mkdir -p vscode/queries
+          if [ -d "queries/sinq" ]; then
+            cp -r queries/sinq/* vscode/queries/
+          else
+            cp -r queries/* vscode/queries/
+          fi
+          cp LICENSE.md vscode/LICENSE.md
+
+      - name: Install Extension Dependencies
+        working-directory: ./vscode
+        run: npm install
+
+      - name: Compile WASM files for Extension
+        working-directory: ./vscode
+        run: |
+          mkdir -p bin
+          npx tree-sitter build --wasm ../ -o bin/tree-sitter-sinq.wasm
+          npx tree-sitter build --wasm node_modules/tree-sitter-lua -o bin/tree-sitter-lua.wasm
+
+      - name: Package into VSIX
+        working-directory: ./vscode
+        run: npx @vscode/vsce package
+
+      - name: Upload VSIX to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} vscode/*.vsix

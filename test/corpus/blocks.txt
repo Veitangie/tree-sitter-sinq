@@ -1,0 +1,28 @@
+==================
+Nightmare Lua Block
+==================
+
+$PRE{
+    local a = "}}}"
+    --[=====[ }}}}}}}\n}}}}}\n}}}]==]\n]=====]
+    print("Done!")
+}
+
+GET ${env.base_url}/path HTTP/1.1
+
+---
+
+(source_file
+  (lifecycle_script
+    directive: (lifecycle_directive)
+    lua_code: (raw_lua_content))
+  (request_line
+    method: (method
+      (method_chunk))
+    url: (url
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content))
+      (url_chunk))
+    proto: (proto
+      (proto_chunk))))

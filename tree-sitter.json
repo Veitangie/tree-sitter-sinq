@@ -1,0 +1,19 @@
+{
+  "grammars": [
+    {
+      "name": "sinq",
+      "camelcase": "Sinq",
+      "scope": "source.sinq",
+      "file-types": [
+        "sinq",
+        "scenario"
+      ],
+      "injection-regex": "^sinq$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "GPL-3.0",
+    "description": "Sinq grammar for tree-sitter"
+  }
+}
