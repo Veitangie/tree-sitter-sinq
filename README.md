@@ -28,6 +28,14 @@ return {
         sinq = "sinq",
       },
     })
+    vim.filetype.add({
+      filename = {
+        [".scenario"] = "json",
+      },
+      extension = {
+        scenario = "json",
+      },
+    })
 
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "sinq",

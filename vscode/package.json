@@ -1,12 +1,12 @@
 {
-  "name": "sinq",
+  "name": "sinq-helper",
   "publisher": "Veitangie",
   "repository": {
     "type": "git",
     "url": "https://github.com/Veitangie/tree-sitter-sinq.git"
   },
-  "displayName": "sinq",
-  "description": "Sinq syntax highlighting",
+  "displayName": "Sinq Helper",
+  "description": "Sinq syntax highlighting, more features might be coming.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.120.0"
@@ -30,7 +30,12 @@
           ".sinq"
         ]
       }
-    ]
+    ],
+    "configurationDefaults": {
+      "files.associations": {
+        "*.scenario": "json"
+      }
+    }
   },
   "devDependencies": {
     "@types/emscripten": "^1.41.5",
