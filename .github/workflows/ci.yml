@@ -6,11 +6,13 @@ on:
     paths:
       - 'src/**'
       - 'grammar.js'
+      - 'vscode/**'
   pull_request:
     branches: [ "**" ]
     paths:
       - 'src/**'
       - 'grammar.js'
+      - 'vscode/**'
   release:
     types: [published]
 
@@ -74,7 +76,6 @@ jobs:
   build-vscode:
     name: Build VS Code Extension
     needs: test
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -109,7 +110,19 @@ jobs:
         working-directory: ./vscode
         run: npx @vscode/vsce package
 
-      - name: Upload VSIX to GitHub Release
+      - name: Get Target Release Tag
+        id: release_tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} vscode/*.vsix
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=$(gh release view --json tagName --jq .tagName)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload VSIX to GitHub Release
+        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release_tag.outputs.tag }} vscode/*.vsix --clobber

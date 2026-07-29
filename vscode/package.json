@@ -7,7 +7,7 @@
   },
   "displayName": "Sinq Helper",
   "description": "Sinq syntax highlighting, more features might be coming.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "GPL-3.0",
   "engines": {
     "vscode": "^1.45.0"

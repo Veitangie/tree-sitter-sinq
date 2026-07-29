@@ -59,7 +59,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     const luaQuery = new Query(luaLanguage, `
-        (function_call name: (identifier) @method)
+        (call function: (identifier) @method)
+        (call function: (variable name: (identifier) @method))
         (string) @string
         (number) @number
         (identifier) @variable
