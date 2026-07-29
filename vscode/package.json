@@ -7,12 +7,19 @@
   },
   "displayName": "Sinq Helper",
   "description": "Sinq syntax highlighting, more features might be coming.",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "license": "GPL-3.0",
   "engines": {
     "vscode": "^1.120.0"
   },
   "categories": [
     "Programming Languages"
+  ],
+  "keywords": [
+    "sinq",
+    "tree-sitter",
+    "api",
+    "testing"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",

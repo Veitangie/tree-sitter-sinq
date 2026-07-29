@@ -1,0 +1,38 @@
+==================
+Multiple Requests
+==================
+
+### Request one
+GET https://google.com
+
+### Request two
+POST https://my.api.dev
+
+{ "key": "value" }
+$ASSERT{ sinq.assert.code(200) }
+
+---
+
+(source_file
+  (request_separator
+    (request_name))
+  (request
+    (request_line
+      (method
+        (method_chunk))
+      (url
+        (url_chunk))))
+  (request_separator
+    (request_name))
+  (request
+    (request_line
+      (method
+        (method_chunk))
+      (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      (lifecycle_directive)
+      (raw_lua_content))))

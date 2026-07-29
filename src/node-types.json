@@ -19,6 +19,11 @@
     }
   },
   {
+    "type": "body_chunk",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "directive",
     "named": true,
     "fields": {}
@@ -212,6 +217,33 @@
     }
   },
   {
+    "type": "request",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "header_line",
+          "named": true
+        },
+        {
+          "type": "lifecycle_script",
+          "named": true
+        },
+        {
+          "type": "request_line",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "request_line",
     "named": true,
     "fields": {
@@ -258,28 +290,35 @@
     }
   },
   {
+    "type": "request_separator",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "request_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
-    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "body",
+          "type": "request",
           "named": true
         },
         {
-          "type": "header_line",
-          "named": true
-        },
-        {
-          "type": "lifecycle_script",
-          "named": true
-        },
-        {
-          "type": "request_line",
+          "type": "request_separator",
           "named": true
         }
       ]
@@ -329,10 +368,6 @@
     "named": false
   },
   {
-    "type": "body_chunk",
-    "named": true
-  },
-  {
     "type": "dynamic_chunk",
     "named": true
   },
@@ -354,6 +389,10 @@
   },
   {
     "type": "raw_lua_content",
+    "named": true
+  },
+  {
+    "type": "request_name",
     "named": true
   },
   {

@@ -14,7 +14,8 @@ const tokenTypes = [
     'variable',
     'property',
     'function',
-    'number'
+    'number',
+    'comment'
 ];
 const tokenModifiers: string[] = [];
 const legend = new vscode.SemanticTokensLegend(tokenTypes, tokenModifiers);
@@ -29,7 +30,9 @@ const captureToTokenMap: Record<string, number> = {
     'field': 5,
     'string': 3,
     'variable': 4,
-    'string.special': 3
+    'string.special': 3,
+    'comment': 8,
+    'markup.heading': 8
 };
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -46,6 +49,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const sinqHighlights = fs.readFileSync(path.join(context.extensionPath, 'queries', 'highlights.scm'), 'utf8');
     const sinqQuery = new Query(sinqLanguage, sinqHighlights);
+
+    let sinqFoldsQuery: Query | undefined;
+    try {
+        const sinqFolds = fs.readFileSync(path.join(context.extensionPath, 'queries', 'folds.scm'), 'utf8');
+        sinqFoldsQuery = new Query(sinqLanguage, sinqFolds);
+    } catch (e) {
+        // folds.scm might not be available or loadable, which is fine
+    }
 
     const luaQuery = new Query(luaLanguage, `
         (function_call name: (identifier) @method)
@@ -109,5 +120,30 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSemanticTokensProvider({ language: 'sinq' }, provider, legend)
+    );
+
+    const foldingProvider: vscode.FoldingRangeProvider = {
+        provideFoldingRanges(document: vscode.TextDocument): vscode.FoldingRange[] {
+            if (!sinqFoldsQuery) return [];
+            const tree = parser.parse(document.getText());
+            if (!tree) return [];
+            
+            const captures = sinqFoldsQuery.captures(tree.rootNode);
+            const ranges: vscode.FoldingRange[] = [];
+            
+            for (const capture of captures) {
+                if (capture.name === 'fold' && capture.node.startPosition.row < capture.node.endPosition.row) {
+                    ranges.push(new vscode.FoldingRange(
+                        capture.node.startPosition.row,
+                        capture.node.endPosition.row
+                    ));
+                }
+            }
+            return ranges;
+        }
+    };
+
+    context.subscriptions.push(
+        vscode.languages.registerFoldingRangeProvider({ language: 'sinq' }, foldingProvider)
     );
 }

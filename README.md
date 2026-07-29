@@ -3,14 +3,23 @@
 
 # tree-sitter-sinq
 
-A Tree-sitter grammar for **Sinq**, a domain-specific language (DSL) for standalone CLI API testing.
+A Tree-sitter grammar for **Sinq**, a domain-specific language (DSL) for standalone CLI API testing. 
+
+Learn more about Sinq at the official homepage: [https://sinq.veitangie.dev](https://sinq.veitangie.dev)
 
 ## Features
 
 * **Full AST Generation:** Strictly parses HTTP request lines, headers, and bodies.
+* **Multiple Requests:** Support for defining multiple requests in a single file separated by `###`.
 * **Embedded Lua:** Provides syntax highlighting and injection for Lua scripts inside `$PRE{}`, `$POST{}`, and `$ASSERT{}` lifecycle blocks, as well as inline `${...}` evaluations.
 
 ## Editor Integration
+
+### VSCode
+
+A Visual Studio Code extension is provided in the `vscode/` directory. It automatically packages the tree-sitter WASM parser and provides rich semantic syntax highlighting and folding capabilities out-of-the-box.
+
+You can install it directly from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Veitangie.sinq-helper).
 
 ### Neovim (0.10+)
 

@@ -17,6 +17,26 @@ module.exports = grammar({
 
   rules: {
     source_file: $ => seq(
+      optional($.request),
+      repeat(seq(
+        $.request_separator,
+        optional($.request)
+      ))
+    ),
+
+    request_separator: $ => seq(
+      choice(
+        /###/,
+        /\r?\n###/
+      ),
+      optional(/[ \t]+/),
+      optional(field('name', $.request_name)),
+      /\r?\n/
+    ),
+
+    request_name: $ => /[^\r\n]+/,
+
+    request: $ => seq(
       optional($._ws),
       repeat(seq($.lifecycle_script, optional($._ws))),
       $.request_line,
@@ -96,7 +116,16 @@ module.exports = grammar({
     dynamic_header: $ => seq(optional($.dynamic_chunk), $.inline_script, repeat(choice($.dynamic_chunk, $.inline_script))),
     dynamic_chunk: $ => /[^\r\n:$]+/,
 
-    body: $ => seq(/\r?\n/,repeat1(choice($.body_chunk, $.inline_script))),
-    body_chunk: $ => /[^$]+/
+    body: $ => seq(
+      /\r?\n/,
+      repeat1(choice($.body_chunk, $.inline_script))
+    ),
+
+    body_chunk: $ => choice(
+      token(prec(1, /(?:[^$\n]|(?:\r?\n)+[^$#\n]|(?:\r?\n)+#[^$#\n]|(?:\r?\n)+##[^$#\n])+/)),
+      token(prec(1, /(?:\r?\n)+/)),
+      token(prec(1, /(?:\r?\n)+#/)),
+      token(prec(1, /(?:\r?\n)+##/))
+    )
   }
 });

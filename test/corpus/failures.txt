@@ -9,9 +9,10 @@ GET / HTTP/1.1
 ---
 
 (source_file
-  (lifecycle_script
-    (lifecycle_directive
-      (MISSING "$PRE"))
+  (request
+    (lifecycle_script
+      (lifecycle_directive
+        (MISSING "$PRE"))
       (raw_lua_content))
     (request_line
       (method
@@ -19,7 +20,7 @@ GET / HTTP/1.1
       (url
         (url_chunk))
       (proto
-        (proto_chunk))))
+        (proto_chunk)))))
 
 ==================
 Invalid: Two Request Lines
@@ -31,13 +32,14 @@ GET / HTTP/1.1
 ---
 
 (source_file
-  (request_line
-    method: (method
-      (method_chunk))
-    url: (url
-      (url_chunk))
-    proto: (proto
-      (proto_chunk)))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk))
+      proto: (proto
+        (proto_chunk))))
   (ERROR
     (dynamic_chunk)))
 
@@ -51,12 +53,13 @@ Authorization Bearer Token
 ---
 
 (source_file
-  (request_line
-    method: (method
-      (method_chunk))
-    url: (url
-      (url_chunk))
-    proto: (proto
-      (proto_chunk)))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk))
+      proto: (proto
+        (proto_chunk))))
   (ERROR
     (dynamic_chunk)))

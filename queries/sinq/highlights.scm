@@ -19,3 +19,6 @@
 (dynamic_header) @variable
 
 (body_chunk) @string.special
+
+(request_separator
+  name: (request_name) @markup.heading) @comment
