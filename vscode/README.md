@@ -2,7 +2,7 @@
 
 Native Tree-sitter syntax highlighting for `.sinq` in Visual Studio Code. 
 
-This extension provides robust, context-aware syntax highlighting and serves as the official editor integration for the Sinq CLI toolchain. Learn more about Sinq at [https://sinq.veitangie.dev](https://sinq.veitangie.dev).
+This extension provides robust, context-aware syntax highlighting and serves as the official editor integration for the Sinq CLI toolchain.
 
 ## Features
 * **Full AST Parsing:** Uses a compiled WebAssembly Tree-sitter grammar for context-aware highlighting.

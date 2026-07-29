@@ -19,7 +19,7 @@ Learn more about Sinq at the official homepage: [https://sinq.veitangie.dev](htt
 
 A Visual Studio Code extension is provided in the `vscode/` directory. It automatically packages the tree-sitter WASM parser and provides rich semantic syntax highlighting and folding capabilities out-of-the-box.
 
-You can install it directly from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Veitangie.sinq-helper).
+You can install it directly from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Veitangie.sinq-helper) (for official VS Code builds) or from the [Open VSX Registry](https://open-vsx.org/extension/Veitangie/sinq-helper) (for VSCodium and Code-OSS).
 
 ### Neovim (0.10+)
 

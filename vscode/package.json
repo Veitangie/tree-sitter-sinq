@@ -7,10 +7,10 @@
   },
   "displayName": "Sinq Helper",
   "description": "Sinq syntax highlighting, more features might be coming.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "GPL-3.0",
   "engines": {
-    "vscode": "^1.120.0"
+    "vscode": "^1.45.0"
   },
   "categories": [
     "Programming Languages"
@@ -21,7 +21,9 @@
     "api",
     "testing"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:sinq"
+  ],
   "main": "./out/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -48,7 +50,7 @@
     "@types/emscripten": "^1.41.5",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.120.0",
+    "@types/vscode": "^1.45.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.3",
