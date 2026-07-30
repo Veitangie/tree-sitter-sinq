@@ -39,11 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await Parser.init();
 
     const sinqWasm = path.join(context.extensionPath, 'bin', 'tree-sitter-sinq.wasm');
-    const luaWasm = path.join(context.extensionPath, 'bin', 'tree-sitter-lua.wasm');
-    
     const sinqLanguage = await Language.load(sinqWasm);
-    const luaLanguage = await Language.load(luaWasm);
-    
     const parser = new Parser();
     parser.setLanguage(sinqLanguage);
 
@@ -58,15 +54,6 @@ export async function activate(context: vscode.ExtensionContext) {
         // folds.scm might not be available or loadable, which is fine
     }
 
-    const luaQuery = new Query(luaLanguage, `
-        (call function: (identifier) @method)
-        (call function: (variable name: (identifier) @method))
-        (string) @string
-        (number) @number
-        (identifier) @variable
-        ["if" "then" "end" "local" "return" "not" "and" "or"] @keyword.function
-    `);
-
     const provider: vscode.DocumentSemanticTokensProvider = {
         provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.SemanticTokens {
             const builder = new vscode.SemanticTokensBuilder(legend);
@@ -74,44 +61,92 @@ export async function activate(context: vscode.ExtensionContext) {
 
             if (!tree) return builder.build();
             const captures = sinqQuery.captures(tree.rootNode);
+            const tokenPriorityMap: Record<number, number> = {
+                0: 10, // keyword
+                1: 5,  // operator
+                2: 10, // method
+                3: 5,  // string
+                4: 1,  // variable (lowest priority)
+                5: 8,  // property
+                6: 10, // function
+                7: 5,  // number
+                8: 2,  // comment
+            };
+
+            const lineToTokens = new Map<number, { type: number, priority: number }[]>();
+            
+            function applyToken(startRow: number, startCol: number, endRow: number, endCol: number, type: number) {
+                const priority = tokenPriorityMap[type] || 0; 
+                for (let r = startRow; r <= endRow; r++) {
+                    if (!lineToTokens.has(r)) lineToTokens.set(r, []);
+                    const chars = lineToTokens.get(r)!;
+                    
+                    const colStart = (r === startRow) ? startCol : 0;
+                    const colEnd = (r === endRow) ? endCol : document.lineAt(r).text.length;
+                    
+                    for (let i = colStart; i < colEnd; i++) {
+                        if (!chars[i] || priority >= chars[i].priority) {
+                            chars[i] = { type, priority };
+                        }
+                    }
+                }
+            }
 
             for (const capture of captures) {
                 if (capture.node.type === 'raw_lua_content') continue;
-
                 const tokenTypeIndex = captureToTokenMap[capture.name];
                 if (tokenTypeIndex !== undefined) {
-                    builder.push(
+                    applyToken(
                         capture.node.startPosition.row,
                         capture.node.startPosition.column,
-                        capture.node.endIndex - capture.node.startIndex,
-                        tokenTypeIndex,
-                        0
+                        capture.node.endPosition.row,
+                        capture.node.endPosition.column,
+                        tokenTypeIndex
                     );
                 }
             }
 
             const luaNodes = tree.rootNode.descendantsOfType('raw_lua_content');
+            const luaRegex = /(--.*)|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(\b\d+(?:\.\d+)?\b)|(\b(?:if|then|else|elseif|end|local|return|not|and|or|true|false|nil|for|while|repeat|until|break|goto|function)\b)|([a-zA-Z_]\w*)/g;
+            
             for (const node of luaNodes) {
-                const luaParser = new Parser();
-                luaParser.setLanguage(luaLanguage);
-                const luaTree = luaParser.parse(node.text);
-                if (!luaTree) continue;
-                const luaCaptures = luaQuery.captures(luaTree.rootNode);
-                
-                for (const lc of luaCaptures) {
-                    const tokenTypeIndex = captureToTokenMap[lc.name] ?? 4; 
-                    
-                    const isFirstLine = lc.node.startPosition.row === 0;
-                    const rowOffset = node.startPosition.row;
-                    const colOffset = isFirstLine ? node.startPosition.column : 0;
+                const lines = node.text.split('\n');
+                for (let r = 0; r < lines.length; r++) {
+                    const lineStr = lines[r];
+                    let match;
+                    while ((match = luaRegex.exec(lineStr)) !== null) {
+                        let typeIndex: number | null = null;
+                        if (match[1]) typeIndex = 8; // comment
+                        else if (match[2] || match[3]) typeIndex = 3; // string
+                        else if (match[4]) typeIndex = 7; // number
+                        else if (match[5]) typeIndex = 0; // keyword
+                        else if (match[6]) typeIndex = 4; // variable
+                        
+                        if (typeIndex !== null) {
+                            const rowOffset = node.startPosition.row + r;
+                            const colOffset = (r === 0) ? node.startPosition.column + match.index : match.index;
+                            applyToken(rowOffset, colOffset, rowOffset, colOffset + match[0].length, typeIndex);
+                        }
+                    }
+                }
+            }
 
-                    builder.push(
-                        rowOffset + lc.node.startPosition.row,
-                        colOffset + lc.node.startPosition.column,
-                        lc.node.endIndex - lc.node.startIndex,
-                        tokenTypeIndex,
-                        0
-                    );
+            const lines = Array.from(lineToTokens.keys()).sort((a, b) => a - b);
+            for (const line of lines) {
+                const chars = lineToTokens.get(line)!;
+                let currentType: number | null = null;
+                let currentStart = -1;
+                
+                for (let i = 0; i <= chars.length; i++) {
+                    const cell = chars[i];
+                    const type = cell ? cell.type : null;
+                    if (type !== currentType) {
+                        if (currentType !== null) {
+                            builder.push(line, currentStart, i - currentStart, currentType, 0);
+                        }
+                        currentType = type;
+                        currentStart = i;
+                    }
                 }
             }
 

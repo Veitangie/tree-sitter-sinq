@@ -95,16 +95,17 @@ jobs:
           fi
           cp LICENSE.md vscode/LICENSE.md
 
+      - name: Install Root Dependencies
+        run: npm install
+
       - name: Install Extension Dependencies
         working-directory: ./vscode
         run: npm install
 
       - name: Compile WASM files for Extension
-        working-directory: ./vscode
         run: |
-          mkdir -p bin
-          npx tree-sitter build --wasm ../ -o bin/tree-sitter-sinq.wasm
-          npx tree-sitter build --wasm node_modules/tree-sitter-lua -o bin/tree-sitter-lua.wasm
+          mkdir -p vscode/bin
+          npx tree-sitter build --wasm -o vscode/bin/tree-sitter-sinq.wasm
 
       - name: Package into VSIX
         working-directory: ./vscode
