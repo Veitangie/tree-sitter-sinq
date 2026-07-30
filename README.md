@@ -3,7 +3,7 @@
 
 # tree-sitter-sinq
 
-A Tree-sitter grammar for **Sinq**, a domain-specific language (DSL) for standalone CLI API testing. 
+A Tree-sitter grammar for **Sinq**, a tool for stateful workflow-based HTTP API testing. 
 
 Learn more about Sinq at the official homepage: [https://sinq.veitangie.dev](https://sinq.veitangie.dev)
 

@@ -1,13 +1,21 @@
 {
   "name": "sinq-helper",
   "publisher": "Veitangie",
+  "homepage": "https://sinq.veitangie.dev",
+  "bugs": {
+    "url": "https://github.com/Veitangie/tree-sitter-sinq/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Veitangie/tree-sitter-sinq.git"
   },
+  "galleryBanner": {
+    "color": "#002b59",
+    "theme": "dark"
+  },
   "displayName": "Sinq Helper",
   "description": "Sinq syntax highlighting, more features might be coming.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "GPL-3.0",
   "engines": {
     "vscode": "^1.45.0"
