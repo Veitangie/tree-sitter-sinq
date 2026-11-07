@@ -79,14 +79,15 @@ bool tree_sitter_sinq_external_scanner_scan(void *payload, TSLexer *lexer,
       continue;
     }
 
+    bool is_comment = false;
     bool is_long_bracket = false;
     if (lexer->lookahead == '-') {
       consume(lexer);
-      if (lexer->lookahead == '-') {
-        consume(lexer);
-        if (lexer->lookahead == '[')
-          is_long_bracket = true;
-      }
+      if (lexer->lookahead != '-')
+        continue;
+      consume(lexer);
+      is_comment = true;
+      is_long_bracket = lexer->lookahead == '[';
     } else if (lexer->lookahead == '[') {
       is_long_bracket = true;
     }
@@ -110,6 +111,15 @@ bool tree_sitter_sinq_external_scanner_scan(void *payload, TSLexer *lexer,
         continue;
       }
     }
+
+    if (is_comment) {
+      while (lexer->lookahead != 0 && lexer->lookahead != '\n')
+        consume(lexer);
+      continue;
+    }
+
+    if (is_long_bracket)
+      continue;
 
     if (lexer->lookahead == '{') {
       brace_depth++;

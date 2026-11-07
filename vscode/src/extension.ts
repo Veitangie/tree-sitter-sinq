@@ -107,7 +107,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             const luaNodes = tree.rootNode.descendantsOfType('raw_lua_content');
-            const luaRegex = /(--.*)|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(\b\d+(?:\.\d+)?\b)|(\b(?:if|then|else|elseif|end|local|return|not|and|or|true|false|nil|for|while|repeat|until|break|goto|function)\b)|([a-zA-Z_]\w*)/g;
+            const luaRegex = /(--.*)|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(\b\d+(?:\.\d+)?\b)|(\b(?:if|then|else|elseif|end|local|return|not|and|or|true|false|nil|for|while|do|in|repeat|until|break|goto|function)\b)|([a-zA-Z_]\w*)/g;
             
             for (const node of luaNodes) {
                 const lines = node.text.split('\n');

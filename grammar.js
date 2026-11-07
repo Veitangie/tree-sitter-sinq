@@ -12,7 +12,10 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
-    [$.header_name, $.dynamic_header]
+    [$.header_name, $.dynamic_header],
+    [$.method, $.url],
+    [$.request_line, $.method, $.url],
+    [$.request_line, $.url]
   ],
 
   rules: {
@@ -26,8 +29,8 @@ module.exports = grammar({
 
     request_separator: $ => seq(
       choice(
-        /###/,
-        /\r?\n###/
+        token(prec(2, /###/)),
+        token(prec(2, /(?:\r?\n)+###/))
       ),
       optional(/[ \t]+/),
       optional(field('name', $.request_name)),
@@ -41,17 +44,33 @@ module.exports = grammar({
       repeat(seq($.lifecycle_script, optional($._ws))),
       $.request_line,
       repeat($.header_line),
-      optional(seq(
-        $.body,
-        optional($._ws)
-      )),
-      repeat(seq($.lifecycle_script, optional($._ws)))
+      optional(choice(
+        seq(
+          /\r?\n/,
+          repeat($._script_before_body),
+          repeat(seq(
+            $.body,
+            optional($._ws),
+            repeat1($._script_before_body)
+          )),
+          optional(seq(
+            $.body,
+            optional($._ws)
+          ))
+        ),
+        repeat1(seq($.lifecycle_script, optional($._ws)))
+      ))
     ),
+
+    _script_before_body: $ => seq($.lifecycle_script, optional($._ws_before_body)),
 
     _ws: $ => /[ \t\r\n]+/,
 
+    _ws_before_body: $ => token(prec(2, /[ \t\r\n]+/)),
+
     lifecycle_script: $ => seq(
       field('directive', $.lifecycle_directive),
+      optional(/[ \t]+/),
       '{',
       field('lua_code', $.raw_lua_content),
       '}'
@@ -61,6 +80,7 @@ module.exports = grammar({
 
     inline_script: $ => seq(
       field('directive', $.directive),
+      optional(/[ \t]+/),
       '{',
       field('lua_code', $.raw_lua_content),
       '}'
@@ -70,24 +90,26 @@ module.exports = grammar({
 
     request_line: $ => seq(
       choice(
-        $.inline_script,
+        prec.dynamic(1, $.inline_script),
         seq(
           field('method', $.method),
-          / /,
+          /[ \t]+/,
           field('url', $.url),
           optional(seq(
-            / /,
+            /[ \t]+/,
             field('proto', $.proto)
           ))
-        )
+        ),
+        field('url', $.url)
       ),
+      optional(/[ \t]+/),
       /\r?\n/
     ),
 
     method: $ => repeat1(choice($.method_chunk, $.inline_script)),
     method_chunk: $ => /[a-zA-Z0-9]+/,
 
-    url: $ => repeat1(choice($.url_chunk, $.inline_script)),
+    url: $ => repeat1(choice($.url_chunk, alias($.method_chunk, $.url_chunk), $.inline_script)),
     url_chunk: $ => /[^\s$]+/,
 
     proto: $ => repeat1(choice($.proto_chunk, $.inline_script)),
@@ -116,10 +138,7 @@ module.exports = grammar({
     dynamic_header: $ => seq(optional($.dynamic_chunk), $.inline_script, repeat(choice($.dynamic_chunk, $.inline_script))),
     dynamic_chunk: $ => /[^\r\n:$]+/,
 
-    body: $ => seq(
-      /\r?\n/,
-      repeat1(choice($.body_chunk, $.inline_script))
-    ),
+    body: $ => repeat1(choice($.body_chunk, $.inline_script)),
 
     body_chunk: $ => choice(
       token(prec(1, /(?:[^$\n]|(?:\r?\n)+[^$#\n]|(?:\r?\n)+#[^$#\n]|(?:\r?\n)+##[^$#\n])+/)),

@@ -3,16 +3,17 @@ name: CI/CD Pipeline
 on:
   push:
     branches: ["**"]
+    tags: ["vscode-[0-9]+.[0-9]+.[0-9]+"]
     paths:
-      - 'src/**'
-      - 'grammar.js'
-      - 'vscode/**'
+      - "src/**"
+      - "grammar.js"
+      - "vscode/**"
   pull_request:
-    branches: [ "**" ]
+    branches: ["**"]
     paths:
-      - 'src/**'
-      - 'grammar.js'
-      - 'vscode/**'
+      - "src/**"
+      - "grammar.js"
+      - "vscode/**"
   release:
     types: [published]
 
@@ -35,9 +36,33 @@ jobs:
           npx tree-sitter generate
           npx tree-sitter test
 
+  generate-abi14:
+    name: Generate ABI 14 Parser
+    needs: test
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Parser
+        run: npx tree-sitter generate --abi 14
+
+      - name: Share Generated Sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: parser-abi14
+          path: src/
+
   build:
     name: Build on ${{ matrix.os }}
-    needs: test
+    needs: generate-abi14
     if: github.event_name == 'release'
     permissions:
       contents: write
@@ -46,36 +71,50 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact: tree-sitter-sinq-linux-x64.so
-            cmd: gcc -O3 -shared -fPIC -I src src/parser.c src/scanner.c -o tree-sitter-sinq-linux-x64.so
-          
-          - os: macos-13
-            artifact: tree-sitter-sinq-macos-x64.dylib
-            cmd: clang -O3 -dynamiclib -fPIC -arch x86_64 -I src src/parser.c src/scanner.c -o tree-sitter-sinq-macos-x64.dylib
-          
+            artifact: tree-sitter-sinq-linux-x64
+            ext: so
+            cc: gcc -O3 -shared -fPIC
+
           - os: macos-latest
-            artifact: tree-sitter-sinq-macos-arm64.dylib
-            cmd: clang -O3 -dynamiclib -fPIC -arch arm64 -I src src/parser.c src/scanner.c -o tree-sitter-sinq-macos-arm64.dylib
-          
+            artifact: tree-sitter-sinq-macos-x64
+            ext: dylib
+            cc: clang -O3 -dynamiclib -fPIC -arch x86_64
+
+          - os: macos-latest
+            artifact: tree-sitter-sinq-macos-arm64
+            ext: dylib
+            cc: clang -O3 -dynamiclib -fPIC -arch arm64
+
           - os: windows-latest
-            artifact: tree-sitter-sinq-windows-x64.dll
-            cmd: gcc -O3 -shared -I src src/parser.c src/scanner.c -o tree-sitter-sinq-windows-x64.dll
+            artifact: tree-sitter-sinq-windows-x64
+            ext: dll
+            cc: gcc -O3 -shared
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Fetch ABI 14 Sources
+        uses: actions/download-artifact@v4
+        with:
+          name: parser-abi14
+          path: src-abi14
+
       - name: Compile Parser
-        run: ${{ matrix.cmd }}
+        run: ${{ matrix.cc }} -I src src/parser.c src/scanner.c -o ${{ matrix.artifact }}.${{ matrix.ext }}
+
+      - name: Compile ABI 14 Parser
+        run: ${{ matrix.cc }} -I src-abi14 src-abi14/parser.c src-abi14/scanner.c -o ${{ matrix.artifact }}-abi14.${{ matrix.ext }}
 
       - name: Upload to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ${{ matrix.artifact }}
+        run: gh release upload ${{ github.event.release.tag_name }} ${{ matrix.artifact }}.${{ matrix.ext }} ${{ matrix.artifact }}-abi14.${{ matrix.ext }} --clobber
 
   build-vscode:
     name: Build VS Code Extension
     needs: test
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -83,6 +122,10 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
+
+      - name: Check Tag Matches Extension Version
+        if: startsWith(github.ref, 'refs/tags/vscode-')
+        run: test "${GITHUB_REF_NAME#vscode-}" = "$(node -p "require('./vscode/package.json').version")"
 
       - name: Resolve Query Symlinks for Packaging
         run: |
@@ -111,19 +154,14 @@ jobs:
         working-directory: ./vscode
         run: npx @vscode/vsce package
 
-      - name: Get Target Release Tag
-        id: release_tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=$(gh release view --json tagName --jq .tagName)" >> $GITHUB_OUTPUT
-          fi
+      - name: Save VSIX as a Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sinq-helper-vsix
+          path: vscode/*.vsix
 
-      - name: Upload VSIX to GitHub Release
-        if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+      - name: Upload VSIX to the Latest GitHub Release
+        if: startsWith(github.ref, 'refs/tags/vscode-')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release_tag.outputs.tag }} vscode/*.vsix --clobber
+        run: gh release upload "$(gh release view --json tagName --jq .tagName)" vscode/*.vsix --clobber

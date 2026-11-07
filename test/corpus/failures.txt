@@ -10,9 +10,10 @@ GET / HTTP/1.1
 
 (source_file
   (request
-    (lifecycle_script
-      (lifecycle_directive
-        (MISSING "$PRE"))
+    (ERROR
+      (url
+        (url_chunk))
+      (dynamic_chunk)
       (raw_lua_content))
     (request_line
       (method

@@ -21,7 +21,11 @@ end
 local script_dir = source:match("(.*[/\\])") or "./"
 
 local target_ext = jit.os == "Windows" and "dll" or "so"
-local file_name = string.format("tree-sitter-sinq-%s-%s.%s", sys_os, sys_arch, sys_ext)
+
+local max_abi = vim and vim.treesitter and vim.treesitter.language_version
+local abi_suffix = (max_abi and max_abi < 15) and "-abi14" or ""
+
+local file_name = string.format("tree-sitter-sinq-%s-%s%s.%s", sys_os, sys_arch, abi_suffix, sys_ext)
 local url = "https://github.com/Veitangie/tree-sitter-sinq/releases/latest/download/" .. file_name
 
 local output_dir = script_dir .. "parser"

@@ -1,0 +1,1141 @@
+==================
+Apostrophe in a Lua line comment
+==================
+
+$PRE{
+    -- don't treat this as a string
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Opening brace in a Lua line comment
+==================
+
+$PRE{
+    -- a { in a comment
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Closing brace in a Lua line comment
+==================
+
+$PRE{
+    -- a } in a comment
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Space before the script brace
+==================
+
+$PRE { local a = 1 }
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Request line with only a URL
+==================
+
+http://a/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))))
+
+==================
+Request line with only a templated URL
+==================
+
+${env.BASE_URL}/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))
+        (url_chunk)))))
+
+==================
+Several spaces between method and URL
+==================
+
+GET   http://a/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Closing brace in a double-quoted index
+==================
+
+$PRE{
+    print(t["}"])
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Closing brace in a single-quoted index
+==================
+
+$PRE{
+    print(t['}'])
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Closing brace in a string after a minus
+==================
+
+$PRE{
+    local a = 1 -"}"
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Closing brace in a false long comment
+==================
+
+$PRE{
+    --[= a } in a comment
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+String inside a Lua line comment
+==================
+
+$PRE{
+    -- "commented out } "
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Long bracket inside a Lua line comment
+==================
+
+$PRE{
+    -- write [[ brackets }]] freely }
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Multiline long comment before code
+==================
+
+$PRE{
+    --[==[ a }
+    ]] still a comment }
+    ]==]
+    local a = 1
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Comment marker inside a string
+==================
+
+$PRE{
+    local a = "-- not a comment }"
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Unary minus before a table
+==================
+
+$PRE{
+    local t = -{ a = 1 }
+}
+GET http://a/b
+
+---
+
+(source_file
+  (request
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Tab between method and URL
+==================
+
+GET	http://a/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Several spaces before the protocol
+==================
+
+GET http://a/b   HTTP/1.1
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk))
+      proto: (proto
+        (proto_chunk)))))
+
+==================
+Trailing whitespace on a request line
+==================
+
+GET http://a/b  
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Trailing whitespace on a URL-only request line
+==================
+
+http://a/b 	
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))))
+
+==================
+URL-only request line followed by a header
+==================
+
+http://a/b
+Accept: */*
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))
+    (header_line
+      name: (header_name
+        (header_name_chunk))
+      value: (header_value
+        (header_value_chunk)))))
+
+==================
+URL-only request line with a script in the scheme
+==================
+
+http${s}://a/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (url_chunk)
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))
+        (url_chunk)))))
+
+==================
+URL-only request line ending in a word
+==================
+
+${base}path
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))
+        (url_chunk)))))
+
+==================
+Templated method with a URL
+==================
+
+P${x}T http://a/b
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk)
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Space before an inline script brace
+==================
+
+GET http://a/$ { x }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))))))
+
+==================
+Space before a named script brace in a header
+==================
+
+GET http://a/b
+X-A: $NAME { x }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (header_line
+      name: (header_name
+        (header_name_chunk))
+      value: (header_value
+        (inline_script
+          directive: (directive)
+          lua_code: (raw_lua_content))))))
+
+==================
+Leading named separator before a URL-only request
+==================
+
+### first
+http://a/b
+
+---
+
+(source_file
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator name with no space
+==================
+
+###first
+http://a/b
+
+---
+
+(source_file
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator between URL-only requests
+==================
+
+http://a/b
+###
+http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      url: (url
+        (url_chunk))))
+  (request_separator)
+  (request
+    (request_line
+      url: (url
+        (url_chunk)))))
+
+==================
+Whole request line from a script
+==================
+
+$LINE{ return 'GET http://a/b' }
+
+---
+
+(source_file
+  (request
+    (request_line
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content)))))
+
+==================
+Script after a blank line with no body
+==================
+
+GET http://a/b
+
+$ASSERT{ x() }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))))
+
+==================
+Script after headers and a blank line with no body
+==================
+
+GET http://a/b
+A: b
+
+$ASSERT{ x() }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (header_line
+      name: (header_name
+        (header_name_chunk))
+      value: (header_value
+        (header_value_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))))
+
+==================
+Two scripts with no body
+==================
+
+GET http://a/b
+
+$PRE{ x() }
+
+$ASSERT{ y() }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))))
+
+==================
+Separator after a bodyless script
+==================
+
+GET http://a/b
+
+$ASSERT{ x() }
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content)))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator after a blank line with no body
+==================
+
+GET http://a/b
+A: b
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (header_line
+      name: (header_name
+        (header_name_chunk))
+      value: (header_value
+        (header_value_chunk))))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator after a body and a blank line
+==================
+
+POST http://a/b
+
+body
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator after a script following a body
+==================
+
+POST http://a/b
+
+body
+
+$ASSERT{ x() }
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content)))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Separator after several blank lines
+==================
+
+GET http://a/b
+
+
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk))))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Two hashes in a body are not a separator
+==================
+
+POST http://a/b
+
+body
+
+## heading
+more
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Script between the headers and the body
+==================
+
+POST http://a/b
+
+$PRE{ x() }
+
+{ "a": 1 }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Scripts on both sides of the body
+==================
+
+POST http://a/b
+
+$PRE{ x() }
+
+{ "a": 1 }
+
+$ASSERT{ y() }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))))
+
+==================
+Script with an inline script in the body after it
+==================
+
+POST http://a/b
+
+$PRE{ x() }
+
+{ "a": ${y} }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content))
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Script inside a line of body text
+==================
+
+POST http://a/b
+
+before $PRE{ x() } after
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Script on its own line inside a body
+==================
+
+POST http://a/b
+
+before
+
+$ASSERT{ x() }
+
+after
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Several scripts between body text
+==================
+
+POST http://a/b
+
+before
+
+$PRE{ x() }
+
+$ASSERT{ y() }
+
+after
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))))
+
+==================
+Inline script in body text after a script
+==================
+
+POST http://a/b
+
+before
+
+$PRE{ x() }
+
+${y}
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (inline_script
+        directive: (directive)
+        lua_code: (raw_lua_content))
+      (body_chunk))))
+
+==================
+Separator after body text following a script
+==================
+
+POST http://a/b
+
+before
+
+$PRE{ x() }
+
+after
+
+### Next
+GET http://a/c
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)))
+  (request_separator
+    name: (request_name))
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))))
+
+==================
+Script after body text following a script
+==================
+
+POST http://a/b
+
+before
+
+$PRE{ x() }
+
+after
+
+$ASSERT{ y() }
+
+---
+
+(source_file
+  (request
+    (request_line
+      method: (method
+        (method_chunk))
+      url: (url
+        (url_chunk)))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))
+    (body
+      (body_chunk)
+      (body_chunk))
+    (lifecycle_script
+      directive: (lifecycle_directive)
+      lua_code: (raw_lua_content))))
